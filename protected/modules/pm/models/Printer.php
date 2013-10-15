@@ -22,7 +22,7 @@ class Printer extends BaseModel {
      * @return string the associated database table name
      */
     public function tableName() {
-        return 'inv_printer';
+        return 'pm_printer';
     }
 
     /**

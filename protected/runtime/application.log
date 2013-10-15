@@ -817,3 +817,29 @@ REQUEST_URI=/prolab/index.php?r=pm/printerPlan/create
 in C:\wamp\www\prolab\protected\modules\pm\models\PrinterPlan.php (81)
 in C:\wamp\www\prolab\protected\modules\pm\controllers\PrinterPlanController.php (77)
 in C:\wamp\www\prolab\index.php (17)
+2013/10/15 20:30:50 [error] [system.db.CDbCommand] CDbCommand::fetchAll() failed: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'prolabnew.pm_printer' doesn't exist. The SQL statement executed was: SHOW COLUMNS FROM `pm_printer`.
+in C:\wamp\www\prolab\protected\modules\pm\controllers\PrinterController.php (135)
+in C:\wamp\www\prolab\index.php (17)
+2013/10/15 20:30:51 [error] [exception.CDbException] exception 'CDbException' with message 'Bảng "pm_printer" dùng cho lớp active record "Printer" không có trong database.' in C:\wamp\www\prolab\framework\db\ar\CActiveRecord.php:2312
+Stack trace:
+#0 C:\wamp\www\prolab\framework\db\ar\CActiveRecord.php(388): CActiveRecordMetaData->__construct(Object(Printer))
+#1 C:\wamp\www\prolab\framework\db\ar\CActiveRecord.php(403): CActiveRecord::model('Printer')
+#2 C:\wamp\www\prolab\framework\db\ar\CActiveRecord.php(78): CActiveRecord->getMetaData()
+#3 C:\wamp\www\prolab\protected\modules\pm\controllers\PrinterController.php(135): CActiveRecord->__construct('search')
+#4 C:\wamp\www\prolab\framework\web\actions\CInlineAction.php(50): PrinterController->actionIndex()
+#5 C:\wamp\www\prolab\framework\web\CController.php(309): CInlineAction->runWithParams(Array)
+#6 C:\wamp\www\prolab\framework\web\filters\CFilterChain.php(134): CController->runAction(Object(CInlineAction))
+#7 C:\wamp\www\prolab\framework\web\filters\CFilter.php(41): CFilterChain->run()
+#8 C:\wamp\www\prolab\framework\web\CController.php(1146): CFilter->filter(Object(CFilterChain))
+#9 C:\wamp\www\prolab\framework\web\filters\CInlineFilter.php(59): CController->filterAccessControl(Object(CFilterChain))
+#10 C:\wamp\www\prolab\framework\web\filters\CFilterChain.php(131): CInlineFilter->filter(Object(CFilterChain))
+#11 C:\wamp\www\prolab\framework\web\CController.php(292): CFilterChain->run()
+#12 C:\wamp\www\prolab\framework\web\CController.php(266): CController->runActionWithFilters(Object(CInlineAction), Array)
+#13 C:\wamp\www\prolab\framework\web\CWebApplication.php(283): CController->run('index')
+#14 C:\wamp\www\prolab\framework\web\CWebApplication.php(142): CWebApplication->runController('pm/printer/inde...')
+#15 C:\wamp\www\prolab\framework\base\CApplication.php(162): CWebApplication->processRequest()
+#16 C:\wamp\www\prolab\index.php(17): CApplication->run()
+#17 {main}
+REQUEST_URI=/prolab/index.php?r=pm/printer/index
+HTTP_REFERER=http://localhost:8084/prolab/index.php?r=pm/printerPlan/index
+---

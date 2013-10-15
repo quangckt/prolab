@@ -44,7 +44,7 @@ class PrinterPlan extends BaseModel {
      * @return string the associated database table name
      */
     public function tableName() {
-        return 'inv_printer_plan';
+        return 'pm_printer_plan';
     }
 
     /**

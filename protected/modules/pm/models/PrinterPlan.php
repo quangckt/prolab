@@ -87,6 +87,9 @@ class PrinterPlan extends BaseModel {
                 if (date('Y-m-d', strtotime($status->dateto)) > date('Y-m-d', strtotime($this->datefrom))) {
                     $this->addError('inv_printer_id', '');
                     $this->addError('id', 'Máy in "' . $status->printer->name . '" với chu kỳ ca từ ngày "' . $status->datefrom . '" tới ngày "' . $status->dateto . ' vẫn đang mở. <br/>Bạn phải đóng trước khi tạo chu kỳ cũ!"');
+                    $this->addError('id', 'Máy in "' . $status->printer->name . '" với chu kỳ ca từ ngày "' . $status->datefrom . '" tới ngày "' . $status->dateto . ' vẫn đang mở. <br/>Bạn phải đóng trước khi tạo chu kỳ cũ!"');
+                    $this->addError('id', 'Máy in "' . $status->printer->name . '" với chu kỳ ca từ ngày "' . $status->datefrom . '" tới ngày "' . $status->dateto . ' vẫn đang mở. <br/>Bạn phải đóng trước khi tạo chu kỳ cũ!"');
+                    $this->addError('id', 'Máy in "' . $status->printer->name . '" với chu kỳ ca từ ngày "' . $status->datefrom . '" tới ngày "' . $status->dateto . ' vẫn đang mở. <br/>Bạn phải đóng trước khi tạo chu kỳ cũ!"');
                 }
             }
         }

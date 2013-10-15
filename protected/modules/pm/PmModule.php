@@ -21,6 +21,8 @@ class PmModule extends CWebModule {
         $this->setImport(array(
             'pm.models.*',
             'pm.components.*',
+            'inv.models.*',
+            'hr.models.*',
         ));
     }
 

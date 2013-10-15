@@ -77,7 +77,12 @@ class PrinterPlan extends BaseModel {
     }
 
     public function checkStatus() {
-        $status = $this->model()->find('datefrom<=:datefrom and inv_printer_id=:inv_printer_id', array(':datefrom' => date('Y-m-d', strtotime($this->datefrom)), ':inv_printer_id' => $this->inv_printer_id));
+        $criteria = new CDbCriteria();
+        $criteria->condition = 'datefrom<=:datefrom and inv_printer_id=:inv_printer_id';
+        $criteria->params = array(':datefrom' => date('Y-m-d', strtotime($this->datefrom)), ':inv_printer_id' => $this->inv_printer_id);
+        $criteria->order = 'id DESC';
+        $criteria->limit = 1;
+        $status = $this->model()->find($criteria);
         if (!empty($status)) {
             if (!$status->status) {
                 $this->addError('datefrom', '');
@@ -86,7 +91,7 @@ class PrinterPlan extends BaseModel {
             } else {
                 if (date('Y-m-d', strtotime($status->dateto)) > date('Y-m-d', strtotime($this->datefrom))) {
                     $this->addError('inv_printer_id', '');
-                    $this->addError('id', 'Máy in "' . $status->printer->name . '" với chu kỳ ca từ ngày "' . $status->datefrom . '" tới ngày "' . $status->dateto . ' vẫn đang mở. <br/>Bạn phải đóng trước khi tạo chu kỳ cũ!"');
+                    $this->addError('id', 'Từ ngày "' . $this->datefrom . '" không được nhỏ hơn ngày kết thúc chu kỳ ca trước ("' . $status->dateto . '") "');
                 }
             }
         }

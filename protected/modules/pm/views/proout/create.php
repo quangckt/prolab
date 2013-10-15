@@ -1,23 +1,21 @@
 <?php
-$this->breadcrumbs=array(
-	'Proouts'=>array('index'),
-	'Create',
+$this->breadcrumbs = array(
+    'Proouts' => array('index'),
+    'Create',
 );
-
 ?>
 
-<h1>Create Proout</h1>
+<h1 class="title">Tạo mới phiếu xuất theo ca</h1>
 <hr/>
 <div class="tools-bar">
-<?php 
-$this->widget('bootstrap.widgets.TbMenu', array(
-	'type'=>'pills',
-	'items'=>array(
-		array('label'=>'Tạo mới', 'icon'=>'icon-plus', 'url'=>Yii::app()->controller->createUrl('create'),'active'=>true, 'linkOptions'=>array()),
-        array('label'=>'Liệt kê', 'icon'=>'icon-th-list', 'url'=>Yii::app()->controller->createUrl('index'), 'linkOptions'=>array()),
-	),
-));
-?>
+    <?php
+    $this->widget('bootstrap.widgets.TbMenu', array(
+        'type' => 'pills',
+        'items' => array(
+            array('label' => 'Liệt kê', 'icon' => 'icon-th-list', 'url' => Yii::app()->controller->createUrl('index'), 'linkOptions' => array()),
+        ),
+    ));
+    ?>
 </div>
 
-<?php echo $this->renderPartial('_form', array('model'=>$model)); ?>
+<?php echo $this->renderPartial('_form', array('model' => $model)); ?>

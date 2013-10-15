@@ -5,16 +5,10 @@ $tdate = date('d-m-Y', time());
 $whid = 70;
 $menu1 = array(
     array('label' => 'Tạo mới', 'icon' => 'plus'),
-    array('label' => 'phiếu nhận việc', 'icon' => 'plus', 'url' => array('/rec/workreceive/create')),
-//    array('label' => 'phiếu xuất', 'icon' => 'plus', 'url' => array('/inv/warehouseout/create')),
-//    array('label' => 'phiếu chuyển', 'icon' => 'plus', 'url' => array('/inv/transfer/create')),
-//    array('label' => 'kiểm kê', 'icon' => 'plus', 'url' => array('/inv/CheckInventory/create')),
-//    array('label' => 'Vật tư sử dụng', 'icon' => 'plus', 'url' => array('/inv/warehouseout/productused')),
+    array('label' => 'phiếu xuất theo ca', 'icon' => 'plus', 'url' => array('/pm/proout/create')),
+    array('label' => 'phiếu tồn theo ca', 'icon' => 'plus', 'url' => array('/pm/proout/proused')),
     array('label' => 'Liệt kê', 'icon' => 'list-alt'),
-    array('label' => 'Phiếu nhận việc', 'icon' => 'list-alt', 'url' => array('/rec/workreceive/index')),
-//    array('label' => 'Phiếu xuất', 'icon' => 'list-alt', 'url' => array('/inv/warehouseout/index')),
-//    array('label' => 'Phiếu chuyển', 'icon' => 'move', 'url' => array('/inv/transfer/index')),
-//    array('label' => 'kiểm kê', 'icon' => 'plus', 'url' => array('/inv/CheckInventory/index')),
+    array('label' => 'Phiếu xuất theo ca', 'icon' => 'list-alt', 'url' => array('/rec/workreceive/index')),
 );
 $menu2 = array(
     array('label' => 'Máy sử dụng', 'icon' => 'list-alt', 'url' => array('/pm/printer/index')),

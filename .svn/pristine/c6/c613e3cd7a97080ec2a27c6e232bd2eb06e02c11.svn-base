@@ -1,0 +1,7 @@
+
+
+.grid-view {   
+}
+.grid-view .summary{ float: right !important; }
+.grid-view .pagination{float: left !important; margin: 0px !important; }
+.grid-view { padding-top: 5px !important; }

@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<StiSerializer version="1.02" type="Flex" application="StiReport">
+  <Dictionary Ref="1" isKey="true" type="Dictionary">
+    <Databases isList="true" count="1">
+      <localhost Ref="2" isKey="true" type="Stimulsoft.Report.Dictionary.StiMySqlDatabase">
+        <Alias>localhost</Alias>
+        <ConnectionString/>
+        <Name>localhost</Name>
+      </localhost>
+    </Databases>
+    <DataSources isList="true" count="2">
+      <dsWhOut Ref="3" isKey="true" type="Stimulsoft.Report.Dictionary.StiMySqlSource">
+        <Alias>dsWhOut</Alias>
+        <Columns isList="true" count="16">
+          <value>active,System.Int32</value>
+          <value>type_name,System.String</value>
+          <value>wh_name,System.String</value>
+          <value>id,System.Int32</value>
+          <value>num,System.String</value>
+          <value>date,System.DateTime</value>
+          <value>note,System.Byte[]</value>
+          <value>type_id,System.Int32</value>
+          <value>create_date,System.DateTime</value>
+          <value>create_uid,System.Int32</value>
+          <value>update_date,System.DateTime</value>
+          <value>update_uid,System.Int32</value>
+          <value>status,System.Int32</value>
+          <value>branch_id,System.Int32</value>
+          <value>amounttotal,System.Decimal</value>
+          <value>wh_id,System.Int32</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>dsWhOut</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters isList="true" count="0"/>
+        <SqlCommand>select i.*,t.name type_name , w.name wh_name
+
+from inv_warehouseout i 
+
+inner join inv_warehouseouttype t on t.id=i.type_id
+
+inner join inv_warehouse w on w.id=i.wh_id
+
+Where i.id={id}</SqlCommand>
+      </dsWhOut>
+      <dsWhOutline Ref="4" isKey="true" type="Stimulsoft.Report.Dictionary.StiMySqlSource">
+        <Alias>dsWhOutline</Alias>
+        <Columns isList="true" count="20">
+          <value>id,System.Int32</value>
+          <value>product_id,System.Int32</value>
+          <value>qty,System.Decimal</value>
+          <value>description,System.String</value>
+          <value>price,System.Decimal</value>
+          <value>note,System.Byte[]</value>
+          <value>subtotal,System.Decimal</value>
+          <value>subvat,System.Decimal</value>
+          <value>create_date,System.DateTime</value>
+          <value>create_uid,System.Int32</value>
+          <value>update_date,System.DateTime</value>
+          <value>update_uid,System.Int32</value>
+          <value>uom_id,System.Int32</value>
+          <value>radio,System.Decimal</value>
+          <value>qtystd,System.Decimal</value>
+          <value>counter,System.Decimal</value>
+          <value>warehouseout_id,System.Int32</value>
+          <value>product_name,System.String</value>
+          <value>code,System.String</value>
+          <value>uom_name,System.String</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>dsWhOutline</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters isList="true" count="0"/>
+        <SqlCommand>select d.*,p.name product_name,p.code,u.name uom_name
+from inv_warehouseoutline d 
+inner join product_item p on p.id=d.product_id
+inner join product_uom u on u.id=d.uom_id
+where d.warehouseout_id={id}</SqlCommand>
+      </dsWhOutline>
+    </DataSources>
+    <Relations isList="true" count="0"/>
+    <Report isRef="0"/>
+    <Variables isList="true" count="0"/>
+  </Dictionary>
+  <EngineVersion>EngineV2</EngineVersion>
+  <GlobalizationStrings isList="true" count="0"/>
+  <MetaTags isList="true" count="0"/>
+  <Pages isList="true" count="1">
+    <Page1 Ref="5" isKey="true" type="Page">
+      <Border>None;Black;2;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Components isList="true" count="5">
+        <ReportTitleBand1 Ref="6" isKey="true" type="ReportTitleBand">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,0.4,19,1.8</ClientRectangle>
+          <Components isList="true" count="2">
+            <Text1 Ref="7" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>5.2,0.4,9,1</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,14</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text1</Name>
+              <Page isRef="5"/>
+              <Parent isRef="6"/>
+              <Text>Phiếu xuất kho</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text1>
+            <Text12 Ref="8" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0.2,0,2.8,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text12</Name>
+              <Page isRef="5"/>
+              <Parent isRef="6"/>
+              <Text>Minh Tâm</Text>
+              <TextBrush>Black</TextBrush>
+            </Text12>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <Name>ReportTitleBand1</Name>
+          <Page isRef="5"/>
+          <Parent isRef="5"/>
+        </ReportTitleBand1>
+        <DataBand1 Ref="9" isKey="true" type="DataBand">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,3,19,3.4</ClientRectangle>
+          <Components isList="true" count="10">
+            <Text2 Ref="10" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>10,0.2,6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text2</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>{dsWhOut.num}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text2>
+            <Text3 Ref="11" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>8.4,0.2,1.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text3</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>Số phiếu:</Text>
+              <TextBrush>Black</TextBrush>
+            </Text3>
+            <Text4 Ref="12" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>2.8,0.2,4.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text4</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>{dsWhOut.date}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat Ref="13" isKey="true" type="CustomFormat">
+                <StringFormat>dd/MM/yyyy</StringFormat>
+              </TextFormat>
+            </Text4>
+            <Text5 Ref="14" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>0.6,0.2,2.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text5</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>Ngày xuất:</Text>
+              <TextBrush>Black</TextBrush>
+            </Text5>
+            <Text6 Ref="15" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>2.8,1,7.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text6</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>{dsWhOut.type_name}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text6>
+            <Text7 Ref="16" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0.6,1,1.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text7</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>Xuất cho:</Text>
+              <TextBrush>Black</TextBrush>
+            </Text7>
+            <Text8 Ref="17" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>2.8,1.8,4.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text8</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>{dsWhOut.wh_name}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text8>
+            <Text9 Ref="18" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0.6,1.8,2.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text9</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>Xuất tại kho:</Text>
+              <TextBrush>Black</TextBrush>
+            </Text9>
+            <Text10 Ref="19" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>2.8,2.6,13.8,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text10</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>{dsWhOut.note}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text10>
+            <Text11 Ref="20" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0.6,2.6,1.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text11</Name>
+              <Page isRef="5"/>
+              <Parent isRef="9"/>
+              <Text>Ghi chú:</Text>
+              <TextBrush>Black</TextBrush>
+            </Text11>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <DataSourceName>dsWhOut</DataSourceName>
+          <Filters isList="true" count="0"/>
+          <Name>DataBand1</Name>
+          <Page isRef="5"/>
+          <Parent isRef="5"/>
+          <Sort isList="true" count="0"/>
+        </DataBand1>
+        <HeaderBand1 Ref="21" isKey="true" type="HeaderBand">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,7.2,19,0.6</ClientRectangle>
+          <Components isList="true" count="6">
+            <Text14 Ref="22" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>1.2,0,3.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text14</Name>
+              <Page isRef="5"/>
+              <Parent isRef="21"/>
+              <Text>Mã vật tư</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text14>
+            <Text15 Ref="23" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>4.4,0,6.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text15</Name>
+              <Page isRef="5"/>
+              <Parent isRef="21"/>
+              <Text>Tên vật tư</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text15>
+            <Text17 Ref="24" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>13.2,0,3.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text17</Name>
+              <Page isRef="5"/>
+              <Parent isRef="21"/>
+              <Text>Số lượng</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text17>
+            <Text16 Ref="25" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>10.6,0,2.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text16</Name>
+              <Page isRef="5"/>
+              <Parent isRef="21"/>
+              <Text>ĐVT</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text16>
+            <Text18 Ref="26" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>16.4,0,2.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text18</Name>
+              <Page isRef="5"/>
+              <Parent isRef="21"/>
+              <Text>Counter</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text18>
+            <Text13 Ref="27" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,0,1.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text13</Name>
+              <Page isRef="5"/>
+              <Parent isRef="21"/>
+              <Text>STT</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text13>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <Name>HeaderBand1</Name>
+          <Page isRef="5"/>
+          <Parent isRef="5"/>
+        </HeaderBand1>
+        <DataBand2 Ref="28" isKey="true" type="DataBand">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,8.6,19,0.6</ClientRectangle>
+          <Components isList="true" count="6">
+            <Text19 Ref="29" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>4.4,0,6.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text19</Name>
+              <Page isRef="5"/>
+              <Parent isRef="28"/>
+              <Text>{dsWhOutline.product_name}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text19>
+            <Text20 Ref="30" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>1.2,0,3.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text20</Name>
+              <Page isRef="5"/>
+              <Parent isRef="28"/>
+              <Text>{dsWhOutline.code}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text20>
+            <Text21 Ref="31" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>10.6,0,2.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text21</Name>
+              <Page isRef="5"/>
+              <Parent isRef="28"/>
+              <Text>{dsWhOutline.uom_name}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text21>
+            <Text22 Ref="32" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>13.2,0,3.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text22</Name>
+              <Page isRef="5"/>
+              <Parent isRef="28"/>
+              <Text>{dsWhOutline.qty}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat Ref="33" isKey="true" type="NumberFormat">
+                <DecimalDigits>0</DecimalDigits>
+                <DecimalSeparator>,</DecimalSeparator>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+            </Text22>
+            <Text23 Ref="34" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>16.4,0,2.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text23</Name>
+              <Page isRef="5"/>
+              <Parent isRef="28"/>
+              <Text>{dsWhOutline.counter}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text23>
+            <Text24 Ref="35" isKey="true" type="Text">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,0,1.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text24</Name>
+              <Page isRef="5"/>
+              <Parent isRef="28"/>
+              <Text>{Count(DataBand2,dsWhOutline.id)}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text24>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <DataSourceName>dsWhOutline</DataSourceName>
+          <Filters isList="true" count="0"/>
+          <Name>DataBand2</Name>
+          <Page isRef="5"/>
+          <Parent isRef="5"/>
+          <Sort isList="true" count="0"/>
+        </DataBand2>
+        <FooterBand1 Ref="36" isKey="true" type="FooterBand">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,10,19,0.8</ClientRectangle>
+          <Components isList="true" count="2">
+            <Text25 Ref="37" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>13.2,0.2,3.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text25</Name>
+              <Page isRef="5"/>
+              <Parent isRef="36"/>
+              <Text>{Sum(DataBand2,dsWhOutline.qty)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat Ref="38" isKey="true" type="NumberFormat">
+                <DecimalDigits>0</DecimalDigits>
+                <DecimalSeparator>,</DecimalSeparator>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+            </Text25>
+            <Text26 Ref="39" isKey="true" type="Text">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>9,0.2,4.8,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text26</Name>
+              <Page isRef="5"/>
+              <Parent isRef="36"/>
+              <Text>Tổng cộng:</Text>
+              <TextBrush>Black</TextBrush>
+            </Text26>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <Name>FooterBand1</Name>
+          <Page isRef="5"/>
+          <Parent isRef="5"/>
+        </FooterBand1>
+      </Components>
+      <Conditions isList="true" count="0"/>
+      <Guid>e2e1a7233823885282cfc3e778861726</Guid>
+      <Margins>1,1,1,1</Margins>
+      <Name>Page1</Name>
+      <PageHeight>29.7</PageHeight>
+      <PageWidth>21</PageWidth>
+      <Report isRef="0"/>
+      <Watermark Ref="40" isKey="true" type="Stimulsoft.Report.Components.StiWatermark">
+        <Font>Arial,100</Font>
+        <TextBrush>[50:0:0:0]</TextBrush>
+      </Watermark>
+    </Page1>
+  </Pages>
+  <PrinterSettings Ref="41" isKey="true" type="Stimulsoft.Report.Print.StiPrinterSettings"/>
+  <ReportAlias>Report</ReportAlias>
+  <ReportChanged>09/14/2012 05:33:06 PM</ReportChanged>
+  <ReportCreated>09/14/2012 03:31:30 PM</ReportCreated>
+  <ReportFile>Report.mrt</ReportFile>
+  <ReportGuid>a4ca3588a705748b52c4c456ce6a8c33</ReportGuid>
+  <ReportName>Report</ReportName>
+  <ReportUnit>Centimeters</ReportUnit>
+  <ReportVersion>2012.1.1300</ReportVersion>
+  <ScriptLanguage>CSharp</ScriptLanguage>
+  <Styles isList="true" count="0"/>
+</StiSerializer>

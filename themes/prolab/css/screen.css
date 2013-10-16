@@ -1,0 +1,124 @@
+*{ margin: 0px;}
+html, body {
+height: 100%;
+margin: 0px;
+padding: 0px;
+}
+
+body{
+
+}
+
+.sidebar-nav-fixed {
+     position:fixed;
+     top:50px;
+     width:14.52991452991453%;
+ }
+
+ @media (max-width: 767px) {
+     .sidebar-nav-fixed {
+         width:auto;
+     }
+ }
+
+ @media (max-width: 979px) {
+     .sidebar-nav-fixed {
+         position:static;
+        width: auto;
+     }
+ }
+ 
+
+#view-content{
+padding-top : 50px !important;    
+padding-bottom : 40px !important;    
+}
+#footer {
+position: fixed;
+z-index: 1000000;
+overflow: hidden;
+bottom: 0px;
+left: 0px;
+width: 100%;
+background: white;
+}
+
+#footer hr{
+margin: 2px 0px;
+}
+
+#left-menu{
+}
+.sidebar-right{
+min-width: 150px;
+height: 100%;
+float: right;
+display: block;
+}
+
+.clearfix{
+clear: both;
+}
+.fl{
+float: left;
+}
+.fr { float: right;}
+
+.isnum{
+    text-align: right !important;
+}
+
+
+.debug{
+border:  solid 1px red !important;
+}
+h1.title{
+font-size: 20px;
+line-height: 20px !important ;
+margin: 4px 0px !important;
+}
+hr{margin: 2px 0px !important; }
+.nav {margin-bottom: 4px !important }
+
+.alert-locked {
+    background-color: #999;    
+}
+.wait{
+ padding: 10px;
+ width: 200px;    
+}
+
+.modal{ z-index: 3000 !important;}
+
+/* Splitbar styles; these are the default class names and required styles */
+.splitbarV {
+float:left;width:6px;height:100%;
+line-height:0px;font-size:0px;
+border-left:solid 1px #9cbdff;border-right:solid 1px #9cbdff;
+background:#cbe1fb url(img/panev.gif) 0% 50%;
+}
+.splitbarH {
+height:6px;text-align:left;line-height:0px;font-size:0px;
+border-top:solid 1px #9cbdff;border-bottom:solid 1px #9cbdff;
+background:#cbe1fb url(img/paneh.gif) 50% 0%;
+}
+
+.splitbuttonV{
+margin-top:-41px;margin-left:-4px;top:50%;position:relative;
+height:83px;width:10px;
+background:transparent url(img/panevc.gif) 10px 50%;
+}
+.splitbuttonV.invert{
+margin-left:0px;background:transparent url(img/panevc.gif) 0px 50%;
+}
+.splitbuttonH{
+margin-left:-41px;left:50%;position:relative;
+height:10px !important;width:83px;
+background:transparent url(img/panehc.gif) 50% 0px;
+}
+.splitbuttonH.invert{
+margin-top:-4px;background:transparent url(img/panehc.gif) 50% -10px;
+}
+.splitbarV.working,.splitbarH.working,.splitbuttonV.working,.splitbuttonH.working{
+ -moz-opacity:.50; filter:alpha(opacity=50); opacity:.50;
+}

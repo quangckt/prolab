@@ -1,0 +1,1 @@
+<?php echo $this->renderPartial('_formUpdateCI', array('modelCash' => $modelCash, 'valueOfCI' => $valueOfCI, 'valueOfCIOrr' => $valueOfCIOrr)); ?>

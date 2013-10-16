@@ -1,0 +1,64 @@
+/* -----------------------------------------------------------------------
+
+
+ Blueprint CSS Framework 1.0.1
+ http://blueprintcss.org
+
+   * Copyright (c) 2007-Present. See LICENSE for more info.
+   * See README for instructions on how to use Blueprint.
+   * For credits and origins, see AUTHORS.
+   * This is a compressed file. See the sources in the 'src' directory.
+
+----------------------------------------------------------------------- */
+
+/* print.css */
+body {line-height:1.5;font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;color:#000;background:none;font-size:10pt;}
+.container {background:none;}
+hr {background:#ccc;color:#ccc;width:100%;height:2px;margin:2em 0;padding:0;border:none;}
+hr.space {background:#fff;color:#fff;visibility:hidden;}
+h1, h2, h3, h4, h5, h6 {font-family:"Helvetica Neue", Arial, "Lucida Grande", sans-serif;}
+code {font:.9em "Courier New", Monaco, Courier, monospace;}
+a img {border:none;}
+p img.top {margin-top:0;}
+blockquote {margin:1.5em;padding:1em;font-style:italic;font-size:.9em;}
+.small {font-size:.9em;}
+.large {font-size:1.1em;}
+.quiet {color:#999;}
+.hide {display:none;}
+a:link, a:visited {background:transparent;font-weight:700;text-decoration:underline;}
+a:link:after, a:visited:after {content:" (" attr(href) ")";font-size:90%;}
+
+.grid-view
+{
+    border-collapse: collapse;
+    border-spacing: 0px;
+    width: 100%
+}
+
+.grid-view th,.grid-view td
+{
+    border:1px solid #ddd;
+    padding: 0.3em 0.6em;
+    vertical-align: top;
+}
+
+.grid-view th
+{
+    text-align: right;
+    /*width: 160px;*/
+    font-size: .8em;
+}
+
+
+.navbar,#left-menu,.tools-bar,.search-form,h1.title,#footer {
+  height: 0px !important;
+  display: none;
+  visibility: hidden;  
+  padding: 0px !important;
+  margin: 0px !important;
+  width: 0px !important;
+}
+#view-content{
+    width: 100% !important;
+    display: block;
+}

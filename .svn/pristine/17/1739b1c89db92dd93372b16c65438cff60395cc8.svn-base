@@ -1,0 +1,1573 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<StiSerializer version="1.02" application="StiReport" type="Flex">
+  <Dictionary type="Dictionary" Ref="1" isKey="true">
+    <Databases isList="true" count="1">
+      <localhost type="Stimulsoft.Report.Dictionary.StiMySqlDatabase" Ref="2" isKey="true">
+        <Alias>localhost</Alias>
+        <ConnectionString/>
+        <Name>localhost</Name>
+      </localhost>
+    </Databases>
+    <DataSources isList="true" count="6">
+      <product type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="3" isKey="true">
+        <Alias>product</Alias>
+        <Columns isList="true" count="7">
+          <value>id,System.Int32</value>
+          <value>code,System.String</value>
+          <value>name,System.String</value>
+          <value>uom_id,System.Int32</value>
+          <value>category_id,System.Int32</value>
+          <value>index,System.Int32</value>
+          <value>type_id,System.String</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>product</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters isList="true" count="0"/>
+        <SqlCommand>select id,code,name,uom_id,category_id,`index`,type_id  from product_item</SqlCommand>
+      </product>
+      <uom type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="4" isKey="true">
+        <Alias>uom</Alias>
+        <Columns isList="true" count="2">
+          <value>id,System.Int32</value>
+          <value>name,System.String</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>uom</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters isList="true" count="0"/>
+        <SqlCommand>select id,name from product_uom</SqlCommand>
+      </uom>
+      <category type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="5" isKey="true">
+        <Alias>category</Alias>
+        <Columns isList="true" count="9">
+          <value>id,System.Int32</value>
+          <value>name,System.String</value>
+          <value>create_uid,System.Int32</value>
+          <value>create_date,System.DateTime</value>
+          <value>update_uid,System.Int32</value>
+          <value>update_date,System.DateTime</value>
+          <value>parent_id,System.Int32</value>
+          <value>hascounter,System.Boolean</value>
+          <value>index,System.Int32</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>category</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters isList="true" count="0"/>
+        <SqlCommand>select * from product_category</SqlCommand>
+      </category>
+      <wh type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="6" isKey="true">
+        <Alias>wh</Alias>
+        <Columns isList="true" count="2">
+          <value>id,System.Int32</value>
+          <value>name,System.String</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>wh</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters isList="true" count="0"/>
+        <SqlCommand>select id,name from inv_warehouse</SqlCommand>
+      </wh>
+      <inv type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="7" isKey="true">
+        <Alias>inv</Alias>
+        <Columns isList="true" count="12">
+          <value>product_id,System.Int32</value>
+          <value>code,System.String</value>
+          <value>product_name,System.String</value>
+          <value>uom_name,System.String</value>
+          <value>category_name,System.String</value>
+          <value>warehouse_name,System.String</value>
+          <value>preQty,System.Decimal</value>
+          <value>preAmt,System.Decimal</value>
+          <value>CurrInQty,System.Decimal</value>
+          <value>currInAmt,System.Decimal</value>
+          <value>CurrOutQty,System.Decimal</value>
+          <value>currOutAmt,System.Decimal</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>inv</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters isList="true" count="0"/>
+        <SqlCommand>SELECT 
+product_id,
+`code`,
+product_name,
+uom_name,
+category_name,
+warehouse_name,
+sum(preQty)preQty ,
+sum(preAmt) preAmt,
+sum(CurrInQty) CurrInQty,
+sum(currInAmt) currInAmt,
+sum(CurrOutQty) CurrOutQty,
+sum(currOutAmt) currOutAmt
+ FROM (
+SELECT
+d.product_id,
+p.`code`,
+p.`name` product_name,
+u.`name` uom_name,
+c.`name` category_name,
+w.`name` warehouse_name,
+d.qty preQty,
+d.qty*d.cost preAmt,
+0 CurrInQty,
+0 currInAmt,
+0 CurrOutQty,
+0  currOutAmt
+FROM
+inv_inventorylog i
+INNER JOIN inv_inventorylogdetail d ON i.id = d.inventorylog_id
+INNER JOIN product_item p ON p.id  = d.product_id
+INNER JOIN product_category c ON c.id  = p.category_id
+INNER JOIN inv_warehouse w ON w.id  = d.wh_id
+INNER JOIN product_uom u ON u.id  = d.uom_id
+
+WHERE i.refdate &lt; STR_TO_DATE('{fdate}','%d-%m-%Y') AND  d.wh_id=COALESCE(case {whid} when 0 then null else {whid} end,d.wh_id) 
+			And p.category_id=COALESCE(case {category_id} when 0 then null else {category_id} end,p.category_id)  And p.type_id=COALESCE(case '{type_id}' when '' then null else '{type_id}' end,p.type_id)
+UNION All
+
+SELECT
+d.product_id,
+p.`code`,
+p.`name` product_name,
+u.`name` uom_name,
+c.`name` category_name,
+w.`name` warehouse_name,
+0,
+0,
+CASE WHEN  d.qty&gt;0 THEN d.qty ELSE 0 END as CurrInQty,
+CASE WHEN  d.qty&gt;0 THEN d.qty*d.cost ELSE 0 END  as currInAmt,
+CASE WHEN  d.qty&lt;0 THEN -d.qty ELSE 0 END as CurrOutQty,
+CASE WHEN  d.qty&lt;0 THEN -d.qty*d.cost ELSE 0 END  as currOutAmt
+FROM
+inv_inventorylog i
+INNER JOIN inv_inventorylogdetail d ON i.id = d.inventorylog_id
+INNER JOIN product_item p ON p.id  = d.product_id
+INNER JOIN product_category c ON c.id  = p.category_id
+INNER JOIN inv_warehouse w ON w.id  = d.wh_id
+INNER JOIN product_uom u ON u.id  = d.uom_id
+WHERE i.refdate &gt;= STR_TO_DATE('{fdate}','%d-%m-%Y') AND i.refdate &lt;= STR_TO_DATE('{tdate}','%d-%m-%Y') 
+AND i.reftype&gt;0 
+AND  d.wh_id=COALESCE(case {whid} when 0 then null else {whid} end,d.wh_id) 
+And p.category_id=COALESCE(case {category_id} when 0 then null else {category_id} end,p.category_id)  
+And p.type_id=COALESCE(case '{type_id}' when '' then null else '{type_id}' end ,p.type_id)
+) a GROUP BY product_id,code,product_name,uom_name,category_name,warehouse_name</SqlCommand>
+      </inv>
+      <type type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="8" isKey="true">
+        <Alias>type</Alias>
+        <Columns isList="true" count="4">
+          <value>id,System.String</value>
+          <value>name,System.String</value>
+          <value>isM,System.Boolean</value>
+          <value>parent,System.String</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>type</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters isList="true" count="0"/>
+        <SqlCommand>Select * from product_type</SqlCommand>
+      </type>
+    </DataSources>
+    <Relations isList="true" count="4">
+      <uom type="DataRelation" Ref="9" isKey="true">
+        <Alias>uom</Alias>
+        <ChildColumns isList="true" count="1">
+          <value>uom_id</value>
+        </ChildColumns>
+        <ChildSource isRef="3"/>
+        <Dictionary isRef="1"/>
+        <Name>uom</Name>
+        <NameInSource>pro_uom</NameInSource>
+        <ParentColumns isList="true" count="1">
+          <value>id</value>
+        </ParentColumns>
+        <ParentSource isRef="4"/>
+      </uom>
+      <category type="DataRelation" Ref="10" isKey="true">
+        <Alias>category</Alias>
+        <ChildColumns isList="true" count="1">
+          <value>category_id</value>
+        </ChildColumns>
+        <ChildSource isRef="3"/>
+        <Dictionary isRef="1"/>
+        <Name>category</Name>
+        <NameInSource>cat_pro</NameInSource>
+        <ParentColumns isList="true" count="1">
+          <value>id</value>
+        </ParentColumns>
+        <ParentSource isRef="5"/>
+      </category>
+      <fk_product_inv type="DataRelation" Ref="11" isKey="true">
+        <Alias>fk_product_inv</Alias>
+        <ChildColumns isList="true" count="1">
+          <value>product_id</value>
+        </ChildColumns>
+        <ChildSource isRef="7"/>
+        <Dictionary isRef="1"/>
+        <Name>fk_product_inv</Name>
+        <NameInSource>product</NameInSource>
+        <ParentColumns isList="true" count="1">
+          <value>id</value>
+        </ParentColumns>
+        <ParentSource isRef="3"/>
+      </fk_product_inv>
+      <type_product type="DataRelation" Ref="12" isKey="true">
+        <Alias>type_product</Alias>
+        <ChildColumns isList="true" count="1">
+          <value>type_id</value>
+        </ChildColumns>
+        <ChildSource isRef="3"/>
+        <Dictionary isRef="1"/>
+        <Name>type_product</Name>
+        <NameInSource>type_product</NameInSource>
+        <ParentColumns isList="true" count="1">
+          <value>id</value>
+        </ParentColumns>
+        <ParentSource isRef="8"/>
+      </type_product>
+    </Relations>
+    <Report isRef="0"/>
+    <Variables isList="true" count="5">
+      <value>,fdate,fdate,System.String,_x0030_1_x002D_11_x002D_2012,False,False</value>
+      <value>,tdate,tdate,System.String,_x0033_0_x002D_11_x002D_2012,False,False</value>
+      <value>,whid,whid,System.Nullable`1[System.Decimal],_x0038_1,False,False</value>
+      <value>,category_id,category_id,System.Decimal,,False,False</value>
+      <value>,type_id,type_id,System.String,,False,False</value>
+    </Variables>
+  </Dictionary>
+  <EngineVersion>EngineV2</EngineVersion>
+  <GlobalizationStrings isList="true" count="0"/>
+  <MetaTags isList="true" count="0"/>
+  <Pages isList="true" count="1">
+    <Page1 type="Page" Ref="13" isKey="true">
+      <Border>None;Black;2;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Components isList="true" count="8">
+        <PageFooterBand1 type="PageFooterBand" Ref="14" isKey="true">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,18.21,27.69,0.8</ClientRectangle>
+          <Components isList="true" count="1">
+            <Text8 type="Text" Ref="15" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>23.6,0,4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text8</Name>
+              <Page isRef="13"/>
+              <Parent isRef="14"/>
+              <Text>{PageNofM}</Text>
+              <TextBrush>Black</TextBrush>
+            </Text8>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <Name>PageFooterBand1</Name>
+          <Page isRef="13"/>
+          <Parent isRef="13"/>
+        </PageFooterBand1>
+        <ReportTitleBand1 type="ReportTitleBand" Ref="16" isKey="true">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,0.4,27.69,2</ClientRectangle>
+          <Components isList="true" count="2">
+            <Text1 type="Text" Ref="17" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>3.4,0,18.8,1</ClientRectangle>
+              <ComponentStyle>Title1</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,19</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text1</Name>
+              <Page isRef="13"/>
+              <Parent isRef="16"/>
+              <Text>NHẬP XUẤT TỒN TỔNG HỢP</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text1>
+            <Text9 type="Text" Ref="18" isKey="true">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>5.2,1.2,17,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text9</Name>
+              <Page isRef="13"/>
+              <Parent isRef="16"/>
+              <Text>Từ ngày: {fdate} Đến ngày: {tdate}</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text9>
+          </Components>
+          <ComponentStyle>Title1</ComponentStyle>
+          <Conditions isList="true" count="0"/>
+          <Name>ReportTitleBand1</Name>
+          <Page isRef="13"/>
+          <Parent isRef="13"/>
+        </ReportTitleBand1>
+        <GroupHeaderBand2 type="GroupHeaderBand" Ref="19" isKey="true">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,3.2,27.69,0.6</ClientRectangle>
+          <Components isList="true" count="1">
+            <Text10 type="Text" Ref="20" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,0,27.2,0.6</ClientRectangle>
+              <ComponentStyle>Header2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,12,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text10</Name>
+              <Page isRef="13"/>
+              <Parent isRef="19"/>
+              <Text>{inv.warehouse_name}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text10>
+          </Components>
+          <Condition>{inv.warehouse_name}</Condition>
+          <Conditions isList="true" count="0"/>
+          <Name>GroupHeaderBand2</Name>
+          <Page isRef="13"/>
+          <Parent isRef="13"/>
+        </GroupHeaderBand2>
+        <GroupHeaderBand1 type="GroupHeaderBand" Ref="21" isKey="true">
+          <Brush>Transparent</Brush>
+          <CanBreak>True</CanBreak>
+          <ClientRectangle>0,4.6,27.69,0.6</ClientRectangle>
+          <Components isList="true" count="9">
+            <Text4 type="Text" Ref="22" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[242:234:221]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>0,0,9.6,0.6</ClientRectangle>
+              <ComponentStyle>Header3</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,9,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text4</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{inv.category_name}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text4>
+            <Text52 type="Text" Ref="23" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>9.6,0,2,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text52</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{Sum(DataBand1,inv.preQty)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="24" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text52>
+            <Text53 type="Text" Ref="25" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>11.6,0,2.4,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text53</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{Sum(DataBand1,inv.preAmt)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="26" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text53>
+            <Text54 type="Text" Ref="27" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>14,0,2,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text54</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{Sum(DataBand1,inv.CurrInQty)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="28" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text54>
+            <Text55 type="Text" Ref="29" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>16,0,2.4,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text55</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{Sum(DataBand1,inv.currInAmt)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="30" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text55>
+            <Text56 type="Text" Ref="31" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>18.4,0,2,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text56</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{Sum(DataBand1,inv.CurrOutQty)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="32" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text56>
+            <Text57 type="Text" Ref="33" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>20.4,0,2.4,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text57</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{Sum(DataBand1,inv.currOutAmt)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="34" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text57>
+            <Text58 type="Text" Ref="35" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>22.8,0,2,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text58</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{Sum(inv.preQty+inv.CurrInQty-inv.CurrOutQty)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="36" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text58>
+            <Text59 type="Text" Ref="37" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>24.8,0,2.4,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text59</Name>
+              <Page isRef="13"/>
+              <Parent isRef="21"/>
+              <Text>{Sum(inv.preAmt+inv.currInAmt-inv.currOutAmt)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="38" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text59>
+          </Components>
+          <Condition>{inv.category_name}</Condition>
+          <Conditions isList="true" count="0"/>
+          <Name>GroupHeaderBand1</Name>
+          <Page isRef="13"/>
+          <Parent isRef="13"/>
+        </GroupHeaderBand1>
+        <GroupHeaderBand3 type="GroupHeaderBand" Ref="39" isKey="true">
+          <Brush>Transparent</Brush>
+          <CanBreak>True</CanBreak>
+          <ClientRectangle>0,6,27.69,0.6</ClientRectangle>
+          <Components isList="true" count="9">
+            <Text11 type="Text" Ref="40" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[242:234:221]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>0,0,9.6,0.6</ClientRectangle>
+              <ComponentStyle>Header3</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,9,Bold</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text11</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{inv.fk_product_inv.type_product.parent}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text11>
+            <Text37 type="Text" Ref="41" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>9.6,0,2,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text37</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{Sum(DataBand1,inv.preQty)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="42" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text37>
+            <Text38 type="Text" Ref="43" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>11.6,0,2.4,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text38</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{Sum(DataBand1,inv.preAmt)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="44" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text38>
+            <Text39 type="Text" Ref="45" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>14,0,2,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text39</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{Sum(DataBand1,inv.CurrInQty)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="46" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text39>
+            <Text40 type="Text" Ref="47" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>16,0,2.4,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text40</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{Sum(DataBand1,inv.currInAmt)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="48" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text40>
+            <Text41 type="Text" Ref="49" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>18.4,0,2,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text41</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{Sum(DataBand1,inv.CurrOutQty)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="50" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text41>
+            <Text42 type="Text" Ref="51" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>20.4,0,2.4,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text42</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{Sum(DataBand1,inv.currOutAmt)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="52" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text42>
+            <Text43 type="Text" Ref="53" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>22.8,0,2,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text43</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{Sum(inv.preQty+inv.CurrInQty-inv.CurrOutQty)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="54" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text43>
+            <Text44 type="Text" Ref="55" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>[240:237:232]</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>24.8,0,2.4,0.6</ClientRectangle>
+              <ComponentStyle>Data2</ComponentStyle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text44</Name>
+              <Page isRef="13"/>
+              <Parent isRef="39"/>
+              <Text>{Sum(inv.preAmt+inv.currInAmt-inv.currOutAmt)}</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <TextFormat type="NumberFormat" Ref="56" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text44>
+          </Components>
+          <Condition>{inv.fk_product_inv.type_product.parent}</Condition>
+          <Conditions isList="true" count="0"/>
+          <Name>GroupHeaderBand3</Name>
+          <Page isRef="13"/>
+          <Parent isRef="13"/>
+        </GroupHeaderBand3>
+        <HeaderBand1 type="HeaderBand" Ref="57" isKey="true">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,7.4,27.69,1.2</ClientRectangle>
+          <Components isList="true" count="15">
+            <Text3 type="Text" Ref="58" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>3,0,5.2,1.2</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text3</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Tên vật tư</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text3>
+            <Text6 type="Text" Ref="59" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>1,0,2,1.2</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text6</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Mã VT</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text6>
+            <Text12 type="Text" Ref="60" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>8.2,0,1.4,1.2</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text12</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>ĐVT</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text12>
+            <Text14 type="Text" Ref="61" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>9.6,0.6,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text14</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>SL</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text14>
+            <Text16 type="Text" Ref="62" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>11.6,0.6,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text16</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Giá trị</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text16>
+            <Text18 type="Text" Ref="63" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>9.6,0,4.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text18</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Tồn đầu</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text18>
+            <Text19 type="Text" Ref="64" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>14,0.6,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text19</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>SL nhập</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text19>
+            <Text20 type="Text" Ref="65" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>16,0.6,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text20</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Giá trị nhập</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text20>
+            <Text21 type="Text" Ref="66" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>14,0,8.8,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text21</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Phát sinh</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text21>
+            <Text24 type="Text" Ref="67" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>18.4,0.6,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text24</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>SL xuất</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text24>
+            <Text25 type="Text" Ref="68" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>20.4,0.6,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text25</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Giá trị xuất</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text25>
+            <Text28 type="Text" Ref="69" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>22.8,0.6,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text28</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>SL</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text28>
+            <Text29 type="Text" Ref="70" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>24.8,0.6,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text29</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Giá trị</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text29>
+            <Text30 type="Text" Ref="71" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>22.8,0,4.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text30</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>Tồn cuối</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text30>
+            <Text33 type="Text" Ref="72" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,0,1,1.2</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text33</Name>
+              <Page isRef="13"/>
+              <Parent isRef="57"/>
+              <Text>STT</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text33>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <Name>HeaderBand1</Name>
+          <Page isRef="13"/>
+          <Parent isRef="13"/>
+        </HeaderBand1>
+        <DataBand1 type="DataBand" Ref="73" isKey="true">
+          <Brush>Transparent</Brush>
+          <CanBreak>True</CanBreak>
+          <ClientRectangle>0,9.4,27.69,0.6</ClientRectangle>
+          <Components isList="true" count="12">
+            <Text2 type="Text" Ref="74" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>3,0,5.2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text2</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.product_name}</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text2>
+            <Text7 type="Text" Ref="75" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>1,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text7</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.code}</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text7>
+            <Text13 type="Text" Ref="76" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>8.2,0,1.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text13</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.fk_product_inv.uom.name}</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text13>
+            <Text15 type="Text" Ref="77" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>9.6,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text15</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.preQty}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="78" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text15>
+            <Text17 type="Text" Ref="79" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>11.6,0,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text17</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.preAmt}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="80" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text17>
+            <Text22 type="Text" Ref="81" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>14,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text22</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.CurrInQty}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="82" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text22>
+            <Text23 type="Text" Ref="83" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>16,0,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text23</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.currInAmt}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="84" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text23>
+            <Text26 type="Text" Ref="85" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>18.4,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text26</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.CurrOutQty}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="86" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text26>
+            <Text27 type="Text" Ref="87" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>20.4,0,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text27</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.currOutAmt}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="88" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text27>
+            <Text31 type="Text" Ref="89" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>22.8,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text31</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.preQty+inv.CurrInQty-inv.CurrOutQty}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="90" isKey="true">
+                <GroupSeparator></GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text31>
+            <Text32 type="Text" Ref="91" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>24.8,0,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text32</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{inv.preAmt+inv.currInAmt-inv.currOutAmt}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="92" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text32>
+            <Text34 type="Text" Ref="93" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <CanBreak>True</CanBreak>
+              <ClientRectangle>0,0,1,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text34</Name>
+              <Page isRef="13"/>
+              <Parent isRef="73"/>
+              <Text>{Line}</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text34>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <DataSourceName>inv</DataSourceName>
+          <Filters isList="true" count="0"/>
+          <Name>DataBand1</Name>
+          <Page isRef="13"/>
+          <Parent isRef="13"/>
+          <Sort isList="true" count="9">
+            <value>ASC</value>
+            <value>inv</value>
+            <value>product</value>
+            <value>cat_pro</value>
+            <value>index</value>
+            <value>ASC</value>
+            <value>inv</value>
+            <value>product</value>
+            <value>index</value>
+          </Sort>
+        </DataBand1>
+        <FooterBand1 type="FooterBand" Ref="94" isKey="true">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,10.8,27.69,0.6</ClientRectangle>
+          <Components isList="true" count="9">
+            <Text5 type="Text" Ref="95" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>9.6,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text5</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>{Sum(DataBand1,inv.preQty)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="96" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text5>
+            <Text35 type="Text" Ref="97" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>11.6,0,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text35</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>{Sum(DataBand1,inv.preAmt)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="98" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text35>
+            <Text36 type="Text" Ref="99" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>14,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text36</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>{Sum(DataBand1,inv.CurrInQty)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="100" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text36>
+            <Text46 type="Text" Ref="101" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>16,0,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text46</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>{Sum(DataBand1,inv.currInAmt)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="102" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text46>
+            <Text47 type="Text" Ref="103" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>18.4,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text47</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>{Sum(DataBand1,inv.CurrOutQty)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="104" isKey="true">
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text47>
+            <Text48 type="Text" Ref="105" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>20.4,0,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text48</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>{Sum(DataBand1,inv.currOutAmt)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="106" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text48>
+            <Text49 type="Text" Ref="107" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>22.8,0,2,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text49</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>{Sum(inv.preQty+inv.CurrInQty-inv.CurrOutQty)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="108" isKey="true">
+                <DecimalSeparator>,</DecimalSeparator>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text49>
+            <Text50 type="Text" Ref="109" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>24.8,0,2.4,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10,Bold</Font>
+              <HorAlignment>Right</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text50</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>{Sum(inv.preAmt+inv.currInAmt-inv.currOutAmt)}</Text>
+              <TextBrush>Black</TextBrush>
+              <TextFormat type="NumberFormat" Ref="110" isKey="true">
+                <DecimalDigits>0</DecimalDigits>
+                <GroupSeparator>.</GroupSeparator>
+                <NegativePattern>1</NegativePattern>
+                <UseLocalSetting>False</UseLocalSetting>
+              </TextFormat>
+              <VertAlignment>Center</VertAlignment>
+            </Text50>
+            <Text51 type="Text" Ref="111" isKey="true">
+              <Border>All;Black;1;Solid;False;4;Black</Border>
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,0,9.6,0.6</ClientRectangle>
+              <Conditions isList="true" count="0"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text51</Name>
+              <Page isRef="13"/>
+              <Parent isRef="94"/>
+              <Text>Tổng cộng</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text51>
+          </Components>
+          <Conditions isList="true" count="0"/>
+          <Name>FooterBand1</Name>
+          <Page isRef="13"/>
+          <Parent isRef="13"/>
+        </FooterBand1>
+      </Components>
+      <Conditions isList="true" count="0"/>
+      <Guid>214ad2bdc5a40d1be5baebd9886f70ed</Guid>
+      <Margins>1,1,1,1</Margins>
+      <Name>Page1</Name>
+      <PageHeight>21.01</PageHeight>
+      <PageWidth>29.69</PageWidth>
+      <PaperSize>A4</PaperSize>
+      <Report isRef="0"/>
+      <Watermark type="Stimulsoft.Report.Components.StiWatermark" Ref="112" isKey="true">
+        <Font>Arial,100</Font>
+        <TextBrush>[50:0:0:0]</TextBrush>
+      </Watermark>
+    </Page1>
+  </Pages>
+  <PrinterSettings type="Stimulsoft.Report.Print.StiPrinterSettings" Ref="113" isKey="true"/>
+  <ReportAlias>Report</ReportAlias>
+  <ReportChanged>01/02/2013 03:15:22 PM</ReportChanged>
+  <ReportCreated>09/22/2012 09:41:05 AM</ReportCreated>
+  <ReportFile>Report.mrt</ReportFile>
+  <ReportGuid>f88ca317a99acddab3fcfa543afe9942</ReportGuid>
+  <ReportName>Report</ReportName>
+  <ReportUnit>Centimeters</ReportUnit>
+  <ReportVersion>2012.1.1300</ReportVersion>
+  <ScriptLanguage>CSharp</ScriptLanguage>
+  <Styles isList="true" count="10">
+    <Title1 type="Stimulsoft.Report.StiStyle" Ref="114" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,19</Font>
+      <HorAlignment>Right</HorAlignment>
+      <Name>Title1</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Title1>
+    <Title2 type="Stimulsoft.Report.StiStyle" Ref="115" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[102:77:38];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,9</Font>
+      <Name>Title2</Name>
+      <TextBrush>[102:77:38]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Title2>
+    <Header1 type="Stimulsoft.Report.StiStyle" Ref="116" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,19</Font>
+      <Name>Header1</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Header1>
+    <Header2 type="Stimulsoft.Report.StiStyle" Ref="117" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,12,Bold</Font>
+      <Name>Header2</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Header2>
+    <Header3 type="Stimulsoft.Report.StiStyle" Ref="118" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <AllowUseHorAlignment>True</AllowUseHorAlignment>
+      <AllowUseVertAlignment>True</AllowUseVertAlignment>
+      <Border>All;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>[242:234:221]</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,9,Bold</Font>
+      <Name>Header3</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Header3>
+    <Data1 type="Stimulsoft.Report.StiStyle" Ref="119" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,9</Font>
+      <Name>Data1</Name>
+      <TextBrush>[102:77:38]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Data1>
+    <Data2 type="Stimulsoft.Report.StiStyle" Ref="120" isKey="true">
+      <AllowUseBorderFormatting>False</AllowUseBorderFormatting>
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <AllowUseFont>False</AllowUseFont>
+      <AllowUseTextBrush>False</AllowUseTextBrush>
+      <AllowUseTextOptions>False</AllowUseTextOptions>
+      <Brush>[240:237:232]</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,9</Font>
+      <Name>Data2</Name>
+      <TextBrush>Black</TextBrush>
+    </Data2>
+    <Data3 type="Stimulsoft.Report.StiStyle" Ref="121" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>[240:237:232]</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,9</Font>
+      <Name>Data3</Name>
+      <TextBrush>[102:77:38]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Data3>
+    <Footer1 type="Stimulsoft.Report.StiStyle" Ref="122" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>Top;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,9</Font>
+      <Name>Footer1</Name>
+      <TextBrush>[102:77:38]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Footer1>
+    <Footer2 type="Stimulsoft.Report.StiStyle" Ref="123" isKey="true">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions isList="true" count="0"/>
+      <Font>Arial,12,Bold</Font>
+      <HorAlignment>Right</HorAlignment>
+      <Name>Footer2</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Footer2>
+  </Styles>
+</StiSerializer>

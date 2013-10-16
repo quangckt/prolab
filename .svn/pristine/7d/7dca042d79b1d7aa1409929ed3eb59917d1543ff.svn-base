@@ -1,0 +1,50 @@
+#login-box {
+width: 300px;
+background:#fff;
+background:rgba(255,255,255,0.25);
+padding:20px;
+overflow:hidden;
+border:none;
+margin: 100px auto!important;
+-moz-border-radius:		4px;
+-o-border-radius:		4px;
+-webkit-border-radius:	4px;
+border-radius:			4px;
+}
+
+label.error {
+color: #b94a48;
+}
+
+input.error,
+select.error,
+textarea.error textarea {
+color: #b94a48;
+border-color: #b94a48;
+}
+
+.isnum{
+text-align: right;
+}
+
+form {margin: 0px !important; }
+.form-actions{
+margin: 4px 0px !important;
+padding: 4px 10px !important;
+}
+
+table.tabularInput select,
+table.tabularInput input,
+table.tabularInput textarea,
+table.tabularInput .uneditable-input{ margin-bottom: 2px !important;}
+.help-inline{ display: none !important; }
+
+table.tabularInput td,table.tabularInput th {
+    padding: 0px !important;
+}
+
+
+span.help-block.error{display: none !important; }
+
+.modal .modal-body{ max-height:600px !important;}
+.modal {width: auto !important; }

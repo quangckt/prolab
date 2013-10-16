@@ -1,0 +1,567 @@
+<?php
+$ajaxTimeRecDeli = Yii::app()->controller->createUrl('ajaxTimeRecDeli');
+yii::app()->clientScript->registerScript('newCustomer', '
+    $(document).ready(function() {
+        $("#divCus *").attr("disabled", true);
+        $(".content-box >div >div >input").attr("style","background-color: #ffffff;");
+        $(".content-box >div >div >select").attr("style","background-color: #ffffff;");
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            url: "' . $ajaxTimeRecDeli . '",
+            success: function(data) {
+                $("#lastcodeNew").text(data.lastcodeNew).fadeIn("fast");
+                $("#lastcodeFullNew").text(data.lastcodeFullNew).fadeIn("fast");
+                $("#dateReceive").text(data.dateReceive).fadeIn("fast");
+                $("#dateDeliver").text(data.datedeliver).fadeIn("fast");
+            }
+        });
+    });
+    var getNotmateri = function($el, status, e){
+        if(status){
+            $("#divCus *").attr("disabled", false);
+            $("#divCompVAT *").attr("disabled", false);
+            $("#divCus *").attr("value", "");
+            $(".submitPopover").attr("value","Tạo");
+            $(".showHideLink").fadeIn("slow");
+            control.disable();
+            control.clear();
+            $("#Customer_code").focus();
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: "' . $ajaxTimeRecDeli . '",
+                success: function(data) {
+                    $("#dateReceive").text(data.dateReceive).fadeOut("fast").fadeIn("fast");
+                    $("#dateDeliver").text(data.datedeliver).fadeOut("fast").fadeIn("fast");
+                }
+            });
+        }else{
+            $("#divCus *").attr("disabled", true);
+            $("#divCus *").attr("value", "");
+            $(".submitPopover").attr("value","Tạo");
+            $(".showHideLink").fadeOut("slow");
+            $(".showHideLink").popover("hide");
+            control.enable();
+            control.focus();
+        }
+    };
+    var getReceiveonline = function($el, status, e) {
+        var assign = "";
+        if (status)
+            assign = "1";
+        else
+            assign = "0";
+        $("#Workreceive_receiveonline").val(assign);
+    };
+    var getVAT = function($el, status, e) {
+        var assign = "";
+        if (status)
+            assign = "1";
+        else
+            assign = "0";
+        $("#Workreceive_VAT").val(assign);
+    }
+');
+?>
+<style type="text/css">
+    .selectize-dropdown { display:inline-block; vertical-align:top; overflow:hidden;}
+    .selectize-dropdown-content { padding:0px; margin:-5px -22px -5px -5px; max-height: 300px;}
+    /*.selectize-dropdown-content { padding:10px; margin:-5px -20px -5px -5px; }*/
+    .divItem{color: #3d5d18;background-color: #b8e76f;border: 1px solid #6f9839; border-radius: 3px;display: inline-block;text-shadow:0 1px 0 rgba(255,255,255,0.1);box-shadow:0 1px 1px rgba(0,0,0,0.1);padding: 1px 5px 1px 5px;}
+
+
+    * {
+        /*        padding: 0;  Standard Reset, and we're adding box-sizing:border-box because it's awesome. 
+                margin: 0;
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+                -webkit-box-sizing: border-box; */
+    }
+
+    .content-box {
+        /*width: 100%;  assumes you have this in a container with a set width */
+        /*height: 400px;*/
+        /*margin: 0 auto;*/
+        position: relative; /* So we can position the banner within the box */
+        /*background: gray;*/
+        /*border: 5px solid white;*/
+        /*box-shadow: 0 0 10px rgba(0,0,0,.3);*/
+        /*-moz-box-shadow: 0 0 10px rgba(0,0,0,.3);*/
+        /*-webkit-box-shadow: 0 0 10px rgba(0,0,0,.3);*/
+    }
+
+    #ribbon-container {
+        position: absolute;
+        /*        top: 15px;*/
+        top: 5px;
+        /*        right: -20px;*/
+        right: -15px;
+        overflow: visible; /* so we can see the pseudo-elements we're going to add to the anchor */
+        /*        font-size: 18px;  font-size and line-height must be equal so we can account for the height of the banner */
+        font-size: 14px;
+        /*line-height: 18px;*/
+    }
+
+    #ribbon-container:before {
+        /*        content:"";
+                height: 0;
+                width: 0;
+                display: block;
+                position: absolute;
+                top: 3px;
+                left: 0;
+                border-top: 29px solid rgba(0,0,0,.3);  These 4 border properties create the first part of our drop-shadow 
+                border-bottom: 29px solid rgba(0,0,0,.3); 
+                border-right: 29px solid rgba(0,0,0,.3);
+                border-left: 29px solid transparent;*/
+    }
+
+    #ribbon-container:after { /* This adds the second part of our dropshadow */
+        /*        content:"";
+                height: 3px;
+                background: rgba(0,0,0,.3);
+                display: block;
+                position: absolute;
+                bottom: -3px;
+                        left: 58px;
+                left: 58px;
+                right:3px;*/
+    }
+
+    #ribbon-container a {
+        display:block;
+        /*padding:20px;*/
+        padding:10px;
+        padding-top: 10px; 
+        position:relative; /* allows us to position our pseudo-elements properly */
+        /*        background:#0089d0;*/
+        background:#FFAA00;
+        overflow:visible;
+        /*        height:58px;*/
+        height:38px;
+        /*margin-left:29px;*/
+        color:#fff;
+        text-decoration:none;
+        /*Thêm từ trên xuống chỉ áp dụng cho ribbon này*/
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        /*Thêm từ trên xuống chỉ áp dụng cho ribbon này*/
+        opacity: 0.3;
+        transition-property: opacity;
+        transition-duration: 0.8s;
+    }
+
+    #ribbon-container a:after { /* this creates the "folded" part of our ribbon */
+        content:""; 
+        height: 0;
+        width: 0;
+        display:block;
+        position:absolute;
+        /*bottom:-15px;*/
+        bottom:-10px;
+        right:0;
+        /*        border-top: 15px solid #004a70; 
+                border-right: 15px solid transparent;*/
+        border-top: 10px solid #004a70; 
+        border-right: 15px solid transparent;
+    }
+
+    #ribbon-container a:before { /* this creates the "forked" part of our ribbon */
+        /*        content:"";
+                height: 0;
+                width: 0;
+                display:block;
+                position:absolute;
+                top:0;
+                left:-29px;
+                left:0px;
+                border-top: 29px solid #0089d0; 
+                border-bottom: 29px solid #0089d0; 
+                border-right: 29px solid transparent;
+                border-left: 29px solid transparent;*/
+    }
+
+    #ribbon-container a:hover {
+        background:#009ff1;
+        opacity: 1;
+    }
+
+    #ribbon-container a:hover:before { /* this makes sure that the "forked" part of the ribbon changes color with the anchor on :hover */
+        border-top: 29px solid #009ff1; 
+        border-bottom: 29px solid #009ff1;
+    }
+
+
+    #ribbon-container-VAT {
+        position: absolute;
+        /*        top: 15px;*/
+        top: 5px;
+        /*        right: -20px;*/
+        right: -15px;
+        overflow: visible; /* so we can see the pseudo-elements we're going to add to the anchor */
+        /*        font-size: 18px;  font-size and line-height must be equal so we can account for the height of the banner */
+        font-size: 14px;
+        /*line-height: 18px;*/
+    }
+
+    #ribbon-container-VAT:before {
+        /*        content:"";
+                height: 0;
+                width: 0;
+                display: block;
+                position: absolute;
+                top: 3px;
+                left: 0;
+                border-top: 29px solid rgba(0,0,0,.3);  These 4 border properties create the first part of our drop-shadow 
+                border-bottom: 29px solid rgba(0,0,0,.3); 
+                border-right: 29px solid rgba(0,0,0,.3);
+                border-left: 29px solid transparent;*/
+    }
+
+    #ribbon-container-VAT:after { /* This adds the second part of our dropshadow */
+        /*        content:"";
+                height: 3px;
+                background: rgba(0,0,0,.3);
+                display: block;
+                position: absolute;
+                bottom: -3px;
+                        left: 58px;
+                left: 58px;
+                right:3px;*/
+    }
+
+    #ribbon-container-VAT a {
+        display:block;
+        /*padding:20px;*/
+        padding:10px;
+        padding-top: 10px; 
+        position:relative; /* allows us to position our pseudo-elements properly */
+        /*        background:#0089d0;*/
+        background:#FFAA00;
+        overflow:visible;
+        /*        height:58px;*/
+        height:38px;
+        /*margin-left:29px;*/
+        color:#fff;
+        text-decoration:none;
+        /*Thêm từ trên xuống chỉ áp dụng cho ribbon này*/
+        box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        /*Thêm từ trên xuống chỉ áp dụng cho ribbon này*/
+        opacity: 0.3;
+        transition-property: opacity;
+        transition-duration: 0.8s;
+        /*transition-timing-function: linear;*/
+        /*transition-delay: 2s;*/
+    }
+
+    #ribbon-container-VAT a:after { /* this creates the "folded" part of our ribbon */
+        content:""; 
+        height: 0;
+        width: 0;
+        display:block;
+        position:absolute;
+        /*bottom:-15px;*/
+        bottom:-10px;
+        right:0;
+        /*        border-top: 15px solid #004a70; 
+                border-right: 15px solid transparent;*/
+        border-top: 10px solid #004a70; 
+        border-right: 15px solid transparent;
+    }
+
+    #ribbon-container-VAT a:before { /* this creates the "forked" part of our ribbon */
+        /*        content:"";
+                height: 0;
+                width: 0;
+                display:block;
+                position:absolute;
+                top:0;
+                left:-29px;
+                left:0px;
+                border-top: 29px solid #0089d0; 
+                border-bottom: 29px solid #0089d0; 
+                border-right: 29px solid transparent;
+                border-left: 29px solid transparent;*/
+    }
+
+    #ribbon-container-VAT a:hover {
+        background:#009ff1;
+        opacity: 1;
+    }
+
+    #ribbon-container-VAT a:hover:before { /* this makes sure that the "forked" part of the ribbon changes color with the anchor on :hover */
+        border-top: 29px solid #009ff1; 
+        border-bottom: 29px solid #009ff1;
+    }
+
+</style>
+<div class="well">
+    <?php
+    $cusModel = Customer::model()->findAll();
+    $listCus = array();
+    foreach ($cusModel as $key => $value) {
+        $listCus[] = array(
+            'id' => $value->id,
+            'code' => $value->code,
+            'name' => $value->name,
+            'company' => $value->company,
+            'address' => $value->address
+        );
+    }
+    $listCus = json_encode($listCus);
+    ?>
+    <?php
+    $form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+        'id' => 'workreceive-form',
+        'enableAjaxValidation' => false,
+        'method' => 'post',
+        'type' => 'vertical',
+        'htmlOptions' => array(
+            'enctype' => 'multipart/form-data',
+        //'class' => 'well'
+        )
+    ));
+    ?>
+    <div class="row-fluid">
+        <div class="span6">
+            <div class="row-fluid">
+                <div class="span6">
+                    <?php
+                    $this->widget('bootstrap.widgets.TbToggleButton', array(
+                        'name' => 'notmateri',
+                        'enabledLabel' => 'Khách mới',
+                        'disabledLabel' => 'khách cũ',
+                        //'value' => ord($model->notmateri),
+                        'width' => 230,
+                        'enabledStyle' => true,
+                        'customEnabledStyle' => array(
+                            'background' => '#FF00FF',
+                            'gradient' => '#D300D3',
+                            'color' => '#FFFFFF'
+                        ),
+                        'customDisabledStyle' => array(
+                            'background' => "#FFAA00",
+                            'gradient' => "#DD9900",
+                            'color' => "#333333"
+                        ),
+                        'onChange' => 'js:function($el, status, e){getNotmateri($el, status, e);}',
+                        'htmlOptions' => array(
+                            'class' => 'span'
+                        )
+                    ));
+                    ?>
+                </div>
+                <div class="span6">
+                    <?php
+                    $this->widget('ext.yii-selectize.YiiSelectize', array(
+                        'model' => $model,
+                        'attribute' => 'cus_id',
+                        'useWithBootstrap' => true,
+                        'fullWidth' => true,
+                        'placeholder' => 'Tìm tên khách...',
+                        'htmlOptions' => array(
+                            'id' => 'select-to',
+                        )
+                    ));
+                    ?>
+                </div>
+                <script>
+                    var listCus = <?php echo $listCus ?>;
+                    var $select = $('#select-to').selectize({
+                        //theme: 'contacts',
+                        persist: false,
+                        maxItems: 1,
+                        hideSelected: true,
+                        valueField: 'id',
+                        labelField: 'name',
+                        searchField: ['id', 'code', 'name', 'company', 'address'],
+                        options: listCus,
+                        render: {
+                            item: function(item, escape) {
+                                return '<div class="divItem">' +
+                                        (item.name ? '<span class="email">KH: ' + escape(item.name) + '</span>' : '') +
+                                        '</div>';
+                            },
+                            option: function(item, escape) {
+                                var label = item.code || item.name;
+                                var caption = item.code ? item.name : null;
+                                return '<div>' + (caption ? '<span><strong>' + escape(caption) + '</strong></span>' : '') + '<br/><span>' + escape(item.company) + '</span>' + '<br/>' + escape(item.address) + '</div><hr/>';
+                            }
+                        },
+                        create: false,
+                        onChange: function(value) {
+                            if (value !== '') {
+                                $.ajax({
+                                    type: 'post',
+                                    //dataType: 'json',
+                                    url: '<?php echo yii::app()->controller->createUrl("ajaxCusInfo"); ?>',
+                                    data: {cusID: value},
+                                    complete: function(data) {
+                                        var dataSplit = data.responseText.split('|');
+//                                        console.log(dataSplit['0']);
+//                                        console.log(dataSplit['1']);
+                                        $('#divCus').html(dataSplit['0']).fadeIn('fast');
+                                        $('#ribbon-container').fadeIn('fast');
+                                        $('#divCus *').attr('disabled', true);
+                                        if (dataSplit['1'] !== '') {
+                                            $('#Workreceive_VAT').val('1');
+                                            $('#wrapper-VAT >div').attr('style', 'left: 0px; width: 157.5px');
+                                            $('#wrapper-VAT >div >input').attr('checked', 'checked');
+                                            $('#divCompVAT').html(dataSplit['1']).fadeIn('fast');
+                                            $(".content-box >div >div >input").attr("style", "background-color: #ffffff;");
+                                            $(".content-box >div >div >select").attr("style", "background-color: #ffffff;");
+                                            $('#ribbon-container-VAT').fadeIn('fast');
+                                        } else {
+                                            $('#divCompVAT *').attr('value', '');
+                                            $('#divCompVAT *').attr('disabled', false);
+                                            $('#wrapper-VAT >div').attr('style', 'left:-50%; width: 157.5px;');
+                                            $('#wrapper-VAT >div >input').attr('checked', false);
+                                            $('#ribbon-container-VAT').fadeOut('fast');
+                                            $(".content-box >div >div >input").attr("style", "background-color: #ffffff;");
+                                            $(".content-box >div >div >select").attr("style", "background-color: #ffffff;");
+                                        }
+                                    }
+                                });
+                                $.ajax({
+                                    type: 'post',
+                                    dataType: 'json',
+                                    url: '<?php echo $ajaxTimeRecDeli; ?>',
+                                    success: function(data) {
+                                        $('#dateReceive').text(data.dateReceive).fadeOut('fast').fadeIn('fast');
+                                        $('#dateDeliver').text(data.datedeliver).fadeOut('fast').fadeIn('fast');
+                                    }
+                                });
+                            } else {
+                                $('#divCus *').attr('value', '');
+                                $('#divCompVAT *').attr("value", '');
+                                $('#wrapper-VAT >div').attr('style', 'left:-50%; width: 157.5px;');
+                                $('#wrapper-VAT >div >input').attr('checked', false);
+                                $('#ribbon-container').fadeOut('fast');
+                                $('#ribbon-container-VAT').fadeOut('fast');
+                            }
+                        }
+                    });
+                    var control = $select[0].selectize;
+                </script>
+            </div>
+            <div class="row-fluid">
+                <div class="span3">
+                    <?php echo CHtml::label('Mã phiếu', '', array()); ?>
+                    <?php echo CHtml::tag('span', array('class' => 'span uneditable-input', 'id' => 'lastcodeNew'), '', true); ?>
+                </div>
+                <div class="span3">
+                    <?php echo $form->labelEx($model, 'code', array()) ?>
+                    <?php echo CHtml::tag('span', array('class' => 'span uneditable-input', 'id' => 'lastcodeFullNew'), '', true); ?>
+                    <?php echo CHtml::activeHiddenField($model, 'code', array()); ?>
+                </div>
+                <div class="span3">
+                    <?php echo $form->labelEx($model, 'datereceive', array()) ?>
+                    <?php echo CHtml::tag('span', array('class' => 'span uneditable-input', 'id' => 'dateReceive'), '', true); ?>
+                    <?php echo CHtml::activeHiddenField($model, 'datereceive', array()); ?>
+                </div>
+                <div class="span3">
+                    <?php echo $form->labelEx($model, 'datedeliver', array()) ?>
+                    <?php echo CHtml::tag('span', array('class' => 'span uneditable-input', 'id' => 'dateDeliver'), '', true); ?>
+                    <?php echo CHtml::activeHiddenField($model, 'datedeliver', array()); ?>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    <?php echo $form->labelEx($model, 'user_id', array()) ?>
+                    <?php echo CHtml::tag('span', array('class' => 'span uneditable-input'), User::model()->find('id=:id', array(':id' => yii::app()->user->id))->employee->fullName, true); ?>
+                    <?php echo CHtml::activeHiddenField($model, 'user_id', array()); ?>
+                </div>
+                <div class="span6">
+                    <?php echo $form->dropDownListRow($model, 'user_id2', CHtml::listData(Employee::model()->findAll('status=0'), 'id', 'fullName'), array('class' => 'span', 'prompt' => 'Chọn...')); ?>
+
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span3">
+                    <?php
+                    echo CHtml::activeHiddenField($model, 'VAT', array());
+                    ?>
+                    <?php echo $form->labelEx($model, 'VAT', array()) ?>
+                    <?php
+                    $this->widget('bootstrap.widgets.TbToggleButton', array(
+                        'name' => 'VAT',
+                        'enabledLabel' => 'Có',
+                        'disabledLabel' => 'Không',
+                        'value' => ord($model->VAT),
+                        'width' => 105,
+                        'enabledStyle' => true,
+                        'onChange' => 'js:function($el, status, e){getVAT($el, status, e);}',
+                        'htmlOptions' => array(
+                            'class' => 'span',
+                            'id' => 'VAT',
+                        ),
+                    ));
+                    ?>
+                </div>
+                <div class="span3">
+                    <?php
+                    echo CHtml::activeHiddenField($model, 'receiveonline', array());
+                    ?>
+                    <?php echo $form->labelEx($model, 'receiveonline', array()) ?>
+                    <?php
+                    $this->widget('bootstrap.widgets.TbToggleButton', array(
+                        'name' => 'receiveonline',
+                        'enabledLabel' => 'Có',
+                        'disabledLabel' => 'Không',
+                        'value' => ord($model->receiveonline),
+                        'width' => 105,
+                        'enabledStyle' => true,
+                        'onChange' => 'js:function($el, status, e){getReceiveonline($el, status, e);}',
+                        'htmlOptions' => array(
+                            'class' => 'span'
+                        )
+                    ));
+                    ?>
+                </div>
+                <div class="span3">
+                    <?php echo $form->dropDownListRow($model, 'godeliver', CHtml::listData(Godelivergroup::model()->findAll(), 'id', 'name'), array('class' => 'span')); ?>
+                </div>
+                <div class="span3">
+                    <?php echo $form->textFieldRow($model, 'note', array('class' => 'span', 'maxlength' => 300)); ?>
+                </div>
+            </div>
+            <div class="row-fluid" id="divCompVAT">
+                <?php $this->renderPartial('_formCompanyVAT', array('company' => $company, 'form' => $form)) ?>
+            </div>
+        </div>
+        <div class="span6" id="divCus">
+            <?php $this->renderPartial('_formCustomer', array('customer' => $customer, 'form' => $form)) ?>
+        </div>
+    </div>
+    <div class="row-fluid" style="margin-top: 0px;">
+        <div class="well well-small" style="margin-top: 0px;">
+            <div class="row-fluid">
+                <div class="span12">
+                    adlaldkjalkjd
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-actions">
+        <?php
+        $this->widget('bootstrap.widgets.TbButton', array(
+            'buttonType' => 'submit',
+            'type' => 'primary',
+            'icon' => 'ok white',
+            'label' => $model->isNewRecord ? 'Tạo' : 'Lưu',
+        ));
+        ?>
+        <?php
+        $this->widget('bootstrap.widgets.TbButton', array(
+            'buttonType' => 'reset',
+            'icon' => 'remove',
+            'label' => 'Hủy',
+        ));
+        ?>
+    </div>
+    <?php $this->endWidget(); ?>
+</div>

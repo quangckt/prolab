@@ -1,0 +1,4 @@
+Updated selectize.js to version 0.7.3.
+
+- Updated base.css and the registerScripts method to work with the new version
+- Added the new cssTheme parameter to manually specify a css theme

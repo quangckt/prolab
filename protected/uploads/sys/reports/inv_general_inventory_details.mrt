@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<StiSerializer version="1.02" application="StiReport" type="Flex">
+  <Dictionary isKey="true" type="Dictionary" Ref="1">
+    <Databases count="1" isList="true">
+      <localhost isKey="true" type="Stimulsoft.Report.Dictionary.StiMySqlDatabase" Ref="2">
+        <Alias>localhost</Alias>
+        <ConnectionString/>
+        <Name>localhost</Name>
+      </localhost>
+    </Databases>
+    <DataSources count="3" isList="true">
+      <inventorydetails isKey="true" type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="3">
+        <Alias>inventorydetails</Alias>
+        <Columns count="6" isList="true">
+          <value>indexC,System.Int32</value>
+          <value>indexP,System.Int32</value>
+          <value>code,System.String</value>
+          <value>total,System.Decimal</value>
+          <value>date,System.String</value>
+          <value>dateofweek,System.String</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>inventorydetails</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters count="1" isList="true">
+          <value>Parameter1,,0,0</value>
+        </Parameters>
+        <SqlCommand>SELECT indexC,indexP,`code`,total,date,dateofweek FROM (
+SELECT 
+c.`index` indexC,p.`index` indexP,p.`code`,-SUM(d.qty) total,DATE_FORMAT(l.refdate,'%d/%m') `date`,IF(DAYOFWEEK(l.refdate)=1,'Chủ nhật',CONCAT('Thứ ',DAYOFWEEK(l.refdate))) dateofweek
+FROM inv_inventorylogdetail d
+INNER JOIN inv_inventorylog l ON l.id = d.inventorylog_id
+INNER JOIN product_item p on p.id = d.product_id
+INNER JOIN product_category c ON p.category_id = c.id
+WHERE l.reftype =2 AND 
+l.refdate &gt;= STR_TO_DATE('{fdate}','%d-%m-%Y') AND l.refdate &lt;= STR_TO_DATE('{tdate}','%d-%m-%Y')
+AND  d.wh_id=COALESCE(case {whid} when 0 then null else {whid} end,d.wh_id)
+AND p.type_id= COALESCE(case '{type_id}' when '' then null else '{type_id}' end,p.type_id)
+AND p.id =  COALESCE(case {pid} when 0 then null else {pid} end,p.id)
+AND p.category_id =  COALESCE(case {category_id} when 0 then null else {category_id} end,p.category_id)
+GROUP BY l.refdate,p.id
+
+UNION ALL
+
+SELECT 
+c.`index` indexC,p.`index` indexP,p.`code`,SUM(d.qty) total,'.Tồn đầu' `date`,'' dateofweek
+FROM inv_inventorylogdetail d
+INNER JOIN inv_inventorylog l ON l.id = d.inventorylog_id
+INNER JOIN product_item p on p.id = d.product_id
+INNER JOIN product_category c ON p.category_id = c.id
+WHERE  l.refdate &lt;= STR_TO_DATE('{fdate}','%d-%m-%Y') 
+AND  d.wh_id=COALESCE(case {whid} when 0 then null else {whid} end,d.wh_id)
+AND p.type_id= COALESCE(case '{type_id}' when '' then null else '{type_id}' end,p.type_id)
+AND p.id =  COALESCE(case {pid} when 0 then null else {pid} end,p.id)
+AND p.category_id =  COALESCE(case {category_id} when 0 then null else {category_id} end,p.category_id)
+GROUP BY `date`,p.id
+
+UNION ALL
+
+SELECT 
+c.`index` indexC,p.`index` indexP,p.`code`,SUM(d.qty) total,'Tồn cuối' `date`,'' dateofweek
+FROM inv_inventorylogdetail d
+INNER JOIN inv_inventorylog l ON l.id = d.inventorylog_id
+INNER JOIN product_item p on p.id = d.product_id
+INNER JOIN product_category c ON p.category_id = c.id
+WHERE  l.refdate &lt;= STR_TO_DATE('{tdate}','%d-%m-%Y') AND  d.wh_id=COALESCE(case {whid} when 0 then null else {whid} end,d.wh_id)
+AND p.type_id= COALESCE(case '{type_id}' when '' then null else '{type_id}' end,p.type_id)
+AND p.id =  COALESCE(case {pid} when 0 then null else {pid} end,p.id)
+AND p.category_id =  COALESCE(case {category_id} when 0 then null else {category_id} end,p.category_id)
+GROUP BY `date`,p.id
+)a 
+GROUP BY a.date,a.`code`
+ORDER BY a.date ASC, a.indexC ASC,a.indexP ASC</SqlCommand>
+      </inventorydetails>
+      <wh isKey="true" type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="4">
+        <Alias>wh</Alias>
+        <Columns count="10" isList="true">
+          <value>id,System.Int32</value>
+          <value>name,System.String</value>
+          <value>branch_id,System.Int32</value>
+          <value>active,System.Boolean</value>
+          <value>create_uid,System.Int32</value>
+          <value>create_date,System.DateTime</value>
+          <value>update_uid,System.Int32</value>
+          <value>update_date,System.DateTime</value>
+          <value>default_wh_in,System.Int32</value>
+          <value>default_wh_out,System.Int32</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>wh</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters count="0" isList="true"/>
+        <SqlCommand>select * from inv_warehouse</SqlCommand>
+      </wh>
+      <uom isKey="true" type="Stimulsoft.Report.Dictionary.StiMySqlSource" Ref="5">
+        <Alias>uom</Alias>
+        <Columns count="2" isList="true">
+          <value>id,System.Int32</value>
+          <value>name,System.String</value>
+        </Columns>
+        <CommandTimeout>30</CommandTimeout>
+        <Dictionary isRef="1"/>
+        <Name>uom</Name>
+        <NameInSource>localhost</NameInSource>
+        <Parameters count="0" isList="true"/>
+        <SqlCommand>select * from product_uom</SqlCommand>
+      </uom>
+    </DataSources>
+    <Relations count="0" isList="true"/>
+    <Report isRef="0"/>
+    <Variables count="6" isList="true">
+      <value>,fdate,fdate,System.String,_x0030_1_x002D_11_x002D_2012,False,False</value>
+      <value>,tdate,tdate,System.String,_x0033_1_x002D_12_x002D_2012,False,False</value>
+      <value>,category_id,category_id,System.Int32,,False,False</value>
+      <value>,type_id,type_id,System.String,,False,False</value>
+      <value>,whid,whid,System.Int32,_x0037_0,False,False</value>
+      <value>,pid,pid,System.Int32,,False,False</value>
+    </Variables>
+  </Dictionary>
+  <EngineVersion>EngineV2</EngineVersion>
+  <GlobalizationStrings count="0" isList="true"/>
+  <MetaTags count="0" isList="true"/>
+  <Pages count="1" isList="true">
+    <Page1 isKey="true" type="Page" Ref="6">
+      <Border>None;Black;2;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Components count="1" isList="true">
+        <ReportTitleBand1 isKey="true" type="ReportTitleBand" Ref="7">
+          <Brush>Transparent</Brush>
+          <ClientRectangle>0,0.4,27.7,2.6</ClientRectangle>
+          <Components count="3" isList="true">
+            <Text1 isKey="true" type="Text" Ref="8">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,0,27.7,1.6</ClientRectangle>
+              <ComponentStyle>Header1</ComponentStyle>
+              <Conditions count="0" isList="true"/>
+              <Font>Arial,19</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text1</Name>
+              <Page isRef="6"/>
+              <Parent isRef="7"/>
+              <Text>CHI TIẾT NHẬP XUẤT TỒN</Text>
+              <TextBrush>[193:152:89]</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text1>
+            <Text2 isKey="true" type="Text" Ref="9">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,1.6,27.6,0.6</ClientRectangle>
+              <Conditions count="0" isList="true"/>
+              <Font>Arial,10</Font>
+              <HorAlignment>Center</HorAlignment>
+              <Margins>0,0,0,0</Margins>
+              <Name>Text2</Name>
+              <Page isRef="6"/>
+              <Parent isRef="7"/>
+              <Text>Từ ngày {fdate} đến ngày {tdate}</Text>
+              <TextBrush>Black</TextBrush>
+              <VertAlignment>Center</VertAlignment>
+            </Text2>
+            <CrossTab1 isKey="true" type="Stimulsoft.Report.CrossTab.StiCrossTab" Ref="10">
+              <Brush>Transparent</Brush>
+              <ClientRectangle>0,2.6,27.6,2.6</ClientRectangle>
+              <Components count="8" isList="true">
+                <CrossTab1_Row1_Title isKey="true" type="CrossTitle" Ref="11">
+                  <Border>All;[145:122:79];1;Solid;False;4;Black</Border>
+                  <Brush>Wheat</Brush>
+                  <ClientRectangle>0,0.65,2.4,0.6</ClientRectangle>
+                  <Font>Arial,10</Font>
+                  <Guid>6daab1900d6573c9b81e9293999a38c4</Guid>
+                  <Margins>0,0,0,0</Margins>
+                  <Name>CrossTab1_Row1_Title</Name>
+                  <Page isRef="6"/>
+                  <Parent isRef="10"/>
+                  <Restrictions>AllowMove, AllowResize, AllowSelect, AllowChange</Restrictions>
+                  <Text>Mã vật tư</Text>
+                  <TextBrush>[95:72:29]</TextBrush>
+                  <TypeOfComponent>Row:CrossTab1_Row1</TypeOfComponent>
+                </CrossTab1_Row1_Title>
+                <CrossTab1_LeftTitle isKey="true" type="CrossTitle" Ref="12">
+                  <Border>All;[145:122:79];1;Solid;False;4;Black</Border>
+                  <Brush>Wheat</Brush>
+                  <ClientRectangle>0,0,2.4,0.6</ClientRectangle>
+                  <Enabled>False</Enabled>
+                  <Font>Arial,10</Font>
+                  <Guid>79547c1348b04decd6ab9293a25557dd</Guid>
+                  <Margins>0,0,0,0</Margins>
+                  <Name>CrossTab1_LeftTitle</Name>
+                  <Page isRef="6"/>
+                  <Parent isRef="10"/>
+                  <Restrictions>AllowMove, AllowResize, AllowSelect, AllowChange</Restrictions>
+                  <Text>inventorydetails</Text>
+                  <TextBrush>[95:72:29]</TextBrush>
+                  <TypeOfComponent>LeftTitle</TypeOfComponent>
+                </CrossTab1_LeftTitle>
+                <CrossTab1_RightTitle isKey="true" type="CrossTitle" Ref="13">
+                  <Border>All;[145:122:79];1;Solid;False;4;Black</Border>
+                  <Brush>Wheat</Brush>
+                  <ClientRectangle>2.45,0,1.8,0.6</ClientRectangle>
+                  <Enabled>False</Enabled>
+                  <Font>Arial,10</Font>
+                  <Guid>70aa999224e464d8c23a9293aa730d9f</Guid>
+                  <Margins>0,0,0,0</Margins>
+                  <Name>CrossTab1_RightTitle</Name>
+                  <Page isRef="6"/>
+                  <Parent isRef="10"/>
+                  <Restrictions>AllowMove, AllowResize, AllowSelect, AllowChange</Restrictions>
+                  <Text>date</Text>
+                  <TextBrush>[95:72:29]</TextBrush>
+                  <TypeOfComponent>RightTitle</TypeOfComponent>
+                </CrossTab1_RightTitle>
+                <CrossTab1_RowTotal1 isKey="true" type="CrossRowTotal" Ref="14">
+                  <Border>All;[145:122:79];1;Solid;False;4;Black</Border>
+                  <Brush>[255:255:229]</Brush>
+                  <ClientRectangle>0,1.9,2.4,0.6</ClientRectangle>
+                  <Conditions count="0" isList="true"/>
+                  <Enabled>False</Enabled>
+                  <Font>Arial,10</Font>
+                  <Guid>6539095132beb5475e169293999a9e1c</Guid>
+                  <Margins>0,0,0,0</Margins>
+                  <Name>CrossTab1_RowTotal1</Name>
+                  <Page isRef="6"/>
+                  <Parent isRef="10"/>
+                  <Restrictions>AllowMove, AllowResize, AllowSelect, AllowChange</Restrictions>
+                  <Text>Total</Text>
+                  <TextBrush>Black</TextBrush>
+                </CrossTab1_RowTotal1>
+                <CrossTab1_Row1 isKey="true" type="CrossRow" Ref="15">
+                  <Alias>code</Alias>
+                  <Border>All;[145:122:79];1;Solid;False;4;Black</Border>
+                  <Brush>Wheat</Brush>
+                  <ClientRectangle>0,1.3,2.4,0.6</ClientRectangle>
+                  <Conditions count="0" isList="true"/>
+                  <DisplayValue>{inventorydetails.code}</DisplayValue>
+                  <Font>Arial,10</Font>
+                  <Guid>2aad6183302876d6c5069293998ba8dc</Guid>
+                  <Margins>0,0,0,0</Margins>
+                  <Name>CrossTab1_Row1</Name>
+                  <Page isRef="6"/>
+                  <Parent isRef="10"/>
+                  <Restrictions>AllowMove, AllowResize, AllowSelect, AllowChange</Restrictions>
+                  <Text>code</Text>
+                  <TextBrush>[95:72:29]</TextBrush>
+                  <TotalGuid>6539095132beb5475e169293999a9e1c</TotalGuid>
+                  <Value>{inventorydetails.code}</Value>
+                </CrossTab1_Row1>
+                <CrossTab1_Column1 isKey="true" type="CrossColumn" Ref="16">
+                  <Alias>date</Alias>
+                  <Border>All;[145:122:79];1;Solid;False;4;Black</Border>
+                  <Brush>Wheat</Brush>
+                  <ClientRectangle>2.45,0.65,0.8,0.6</ClientRectangle>
+                  <Conditions count="0" isList="true"/>
+                  <DisplayValue>{inventorydetails.date}
+{inventorydetails.dateofweek}</DisplayValue>
+                  <Font>Arial,10</Font>
+                  <Guid>556bd774414a50be08ab9293a2554a54</Guid>
+                  <Margins>0,0,0,0</Margins>
+                  <Name>CrossTab1_Column1</Name>
+                  <Page isRef="6"/>
+                  <Parent isRef="10"/>
+                  <Restrictions>AllowMove, AllowResize, AllowSelect, AllowChange</Restrictions>
+                  <Text>date</Text>
+                  <TextBrush>[95:72:29]</TextBrush>
+                  <TotalGuid>cf90ff0301820e84350c9293a255b730</TotalGuid>
+                  <Value>{inventorydetails.date}</Value>
+                </CrossTab1_Column1>
+                <CrossTab1_Sum1 isKey="true" type="CrossSummary" Ref="17">
+                  <Alias>total</Alias>
+                  <Border>All;[145:122:79];1;Solid;False;4;Black</Border>
+                  <Brush>[255:255:255]</Brush>
+                  <ClientRectangle>2.45,1.3,0.8,0.6</ClientRectangle>
+                  <Conditions count="0" isList="true"/>
+                  <Font>Arial,10</Font>
+                  <Guid>20310c99cc92d7d105719293aa739305</Guid>
+                  <HorAlignment>Right</HorAlignment>
+                  <Margins>0,0,0,0</Margins>
+                  <Name>CrossTab1_Sum1</Name>
+                  <Page isRef="6"/>
+                  <Parent isRef="10"/>
+                  <Restrictions>AllowMove, AllowResize, AllowSelect, AllowChange</Restrictions>
+                  <Text>0</Text>
+                  <TextBrush>Black</TextBrush>
+                  <Value>{inventorydetails.total}</Value>
+                </CrossTab1_Sum1>
+                <CrossTab1_ColTotal1 isKey="true" type="CrossColumnTotal" Ref="18">
+                  <Border>All;[145:122:79];1;Solid;False;4;Black</Border>
+                  <Brush>[255:255:229]</Brush>
+                  <ClientRectangle>3.25,0.65,1,0.6</ClientRectangle>
+                  <Conditions count="0" isList="true"/>
+                  <Enabled>False</Enabled>
+                  <Font>Arial,10</Font>
+                  <Guid>cf90ff0301820e84350c9293a255b730</Guid>
+                  <Margins>0,0,0,0</Margins>
+                  <Name>CrossTab1_ColTotal1</Name>
+                  <Page isRef="6"/>
+                  <Parent isRef="10"/>
+                  <Restrictions>AllowMove, AllowResize, AllowSelect, AllowChange</Restrictions>
+                  <Text>Total</Text>
+                  <TextBrush>Black</TextBrush>
+                </CrossTab1_ColTotal1>
+              </Components>
+              <Conditions count="0" isList="true"/>
+              <DataRelationName/>
+              <DataSourceName>inventorydetails</DataSourceName>
+              <EmptyValue/>
+              <Filters count="0" isList="true"/>
+              <Name>CrossTab1</Name>
+              <Page isRef="6"/>
+              <Parent isRef="7"/>
+              <Sort count="0" isList="true"/>
+            </CrossTab1>
+          </Components>
+          <Conditions count="0" isList="true"/>
+          <Name>ReportTitleBand1</Name>
+          <Page isRef="6"/>
+          <Parent isRef="6"/>
+        </ReportTitleBand1>
+      </Components>
+      <Conditions count="0" isList="true"/>
+      <Guid>b4509fd04bdd216313ff1c138970a615</Guid>
+      <Margins>1,1,1,1</Margins>
+      <Name>Page1</Name>
+      <Orientation>Landscape</Orientation>
+      <PageHeight>21</PageHeight>
+      <PageWidth>29.7</PageWidth>
+      <Report isRef="0"/>
+      <Watermark isKey="true" type="Stimulsoft.Report.Components.StiWatermark" Ref="19">
+        <Font>Arial,100</Font>
+        <TextBrush>[50:0:0:0]</TextBrush>
+      </Watermark>
+    </Page1>
+  </Pages>
+  <PrinterSettings isKey="true" type="Stimulsoft.Report.Print.StiPrinterSettings" Ref="20"/>
+  <ReportAlias>Report</ReportAlias>
+  <ReportChanged>12/13/2012 02:44:11 PM</ReportChanged>
+  <ReportCreated>11/20/2012 11:29:00 AM</ReportCreated>
+  <ReportFile>Report.mrt</ReportFile>
+  <ReportGuid>aebea307942885219ab9933880348caf</ReportGuid>
+  <ReportName>Report</ReportName>
+  <ReportUnit>Centimeters</ReportUnit>
+  <ReportVersion>2012.1.1300</ReportVersion>
+  <ScriptLanguage>CSharp</ScriptLanguage>
+  <Styles count="10" isList="true">
+    <Title1 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="21">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,19</Font>
+      <HorAlignment>Right</HorAlignment>
+      <Name>Title1</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Title1>
+    <Title2 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="22">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[102:77:38];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,9</Font>
+      <Name>Title2</Name>
+      <TextBrush>[102:77:38]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Title2>
+    <Header1 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="23">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,19</Font>
+      <Name>Header1</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Header1>
+    <Header2 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="24">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,12,Bold</Font>
+      <HorAlignment>Center</HorAlignment>
+      <Name>Header2</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Header2>
+    <Header3 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="25">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <AllowUseHorAlignment>True</AllowUseHorAlignment>
+      <AllowUseVertAlignment>True</AllowUseVertAlignment>
+      <Border>All;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>[242:234:221]</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,9,Bold</Font>
+      <HorAlignment>Center</HorAlignment>
+      <Name>Header3</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Header3>
+    <Data1 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="26">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,9</Font>
+      <Name>Data1</Name>
+      <TextBrush>[102:77:38]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Data1>
+    <Data2 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="27">
+      <AllowUseBorderFormatting>False</AllowUseBorderFormatting>
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <AllowUseFont>False</AllowUseFont>
+      <AllowUseTextBrush>False</AllowUseTextBrush>
+      <AllowUseTextOptions>False</AllowUseTextOptions>
+      <Brush>[240:237:232]</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,9</Font>
+      <Name>Data2</Name>
+      <TextBrush>Black</TextBrush>
+    </Data2>
+    <Data3 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="28">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>[240:237:232]</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,9</Font>
+      <Name>Data3</Name>
+      <TextBrush>[102:77:38]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Data3>
+    <Footer1 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="29">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>Top;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,9</Font>
+      <Name>Footer1</Name>
+      <TextBrush>[102:77:38]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Footer1>
+    <Footer2 isKey="true" type="Stimulsoft.Report.StiStyle" Ref="30">
+      <AllowUseBorderSides>False</AllowUseBorderSides>
+      <Border>None;[193:152:89];1;Solid;False;4;Black</Border>
+      <Brush>Transparent</Brush>
+      <Conditions count="0" isList="true"/>
+      <Font>Arial,12,Bold</Font>
+      <HorAlignment>Right</HorAlignment>
+      <Name>Footer2</Name>
+      <TextBrush>[193:152:89]</TextBrush>
+      <VertAlignment>Center</VertAlignment>
+    </Footer2>
+  </Styles>
+</StiSerializer>
